@@ -1,0 +1,17 @@
+version: '2'
+
+services:
+  manager:
+    build: manager
+    command: bash -c "/usr/bin/docker-quickstart && sleep infinity"
+    hostname: quickstart.cloudera
+    container_name: quickstart.cloudera
+    privileged: true
+    expose:
+      - "8020"  # hdfs
+      - "8032"  # yarn
+  client:
+    build: manager
+    links:
+      - manager
+    command: /bin/true
