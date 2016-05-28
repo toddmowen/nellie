@@ -11,6 +11,14 @@ DAEMONS="\
     hadoop-yarn-resourcemanager \
 "
 
+# Run datanode here too, in order to preserve the data that exists
+# on HDFS (mainly oozie support files). The worker nodes, although
+# based on the same docker image, have had this data deliberately wiped.
+DAEMONS="${DAEMONS} \
+    hadoop-hdfs-datanode \
+    hadoop-yarn-nodemanager \
+"
+
 for daemon in ${DAEMONS}; do
     sudo service ${daemon} start
 done

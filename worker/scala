@@ -1,0 +1,7 @@
+#! /usr/bin/env bash
+# Simple and brittle scala launcher. The base image does not include scala build
+# tools per se, but it does have the requisite 3 jars.
+exec java \
+    -cp /usr/jars/scala-compiler-2.10.5.jar:/usr/jars/scala-library-2.10.5.jar:/usr/jars/scala-reflect-2.10.5.jar \
+    scala.tools.nsc.MainGenericRunner -usejavacp -nc \
+    $*
