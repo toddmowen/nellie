@@ -1,0 +1,37 @@
+#!/usr/bin/env python3
+
+import sys
+import argparse
+import subprocess
+
+parser = argparse.ArgumentParser(description='Manage a virtual hadoop cluster.')
+subparsers = parser.add_subparsers(dest='subcommand', metavar='subcommand')
+subparsers.required = True  # see http://stackoverflow.com/a/18283730/154770
+
+def up(args):
+    subprocess.check_call(['docker-compose', 'up', '-d'])
+    return 0
+
+up_parser = subparsers.add_parser('up', help='Bring up the cluster')
+up_parser.set_defaults(func=up)
+
+def down(argd):
+    subprocess.check_call(['docker-compose', 'down'])
+    subprocess.check_call(['docker-compose', 'rm', '--all'])
+    return 0
+
+down_parser = subparsers.add_parser('down', help='Shut down the cluster')
+down_parser.set_defaults(func=down)
+
+def run(args):
+    return subprocess.call(['docker-compose', 'run', '--rm', 'worker', args.program] + args.args)
+
+run_parser = subparsers.add_parser('run', help='Run a command on the cluster')
+run_parser.add_argument('program')
+run_parser.add_argument('args', nargs=argparse.REMAINDER)
+run_parser.set_defaults(func=run)
+
+if __name__ == '__main__':
+    args = parser.parse_args()
+    exitcode = args.func(args)
+    sys.exit(exitcode)
