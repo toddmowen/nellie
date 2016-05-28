@@ -1,0 +1,16 @@
+#! /usr/bin/env bash
+
+DAEMONS="\
+    mysqld \
+    cloudera-quickstart-init \
+    zookeeper-server \
+    hadoop-hdfs-journalnode \
+    hadoop-hdfs-namenode \
+    hadoop-hdfs-secondarynamenode \
+    hadoop-mapreduce-historyserver \
+    hadoop-yarn-resourcemanager \
+"
+
+for daemon in ${DAEMONS}; do
+    sudo service ${daemon} start
+done

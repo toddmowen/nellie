@@ -1,0 +1,12 @@
+#! /usr/bin/env bash
+
+DAEMONS="\
+    mysqld \
+    cloudera-quickstart-init \
+    hadoop-hdfs-datanode \
+    hadoop-yarn-nodemanager \
+"
+
+for daemon in ${DAEMONS}; do
+    sudo service ${daemon} start
+done
