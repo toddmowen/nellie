@@ -1,0 +1,80 @@
+#!
+#####################################################################################
+#
+# Usage: wait-for-cluster N
+#
+# will wait until the number of active data nodes and yarn nodes are both *exactly* N.
+#
+######################################################################################
+
+HADOOP_ROOT_LOGGER=${HADOOP_ROOT_LOGGER:-ERROR,console}
+
+# The docker image does not include the 'scala' program, but it does include all
+# the necessary jars for us to invoke the scala interpretter via java:
+exec java \
+    -cp /usr/jars/scala-compiler-2.10.5.jar:/usr/jars/scala-library-2.10.5.jar:/usr/jars/scala-reflect-2.10.5.jar:`hadoop classpath` \
+    -Dhadoop.root.logger=$HADOOP_ROOT_LOGGER -Dyarn.root.logger=$HADOOP_ROOT_LOGGER \
+    scala.tools.nsc.MainGenericRunner -usejavacp -nc \
+    "$0" "$@"
+
+######################################################################################
+!#
+
+import org.slf4j.LoggerFactory
+import org.apache.hadoop.conf.Configuration
+import org.apache.hadoop.fs.{FileSystem, CommonConfigurationKeysPublic}
+import org.apache.hadoop.hdfs.DistributedFileSystem
+import org.apache.hadoop.hdfs.protocol.HdfsConstants.DatanodeReportType
+import org.apache.hadoop.yarn.client.api.YarnClient;
+import org.apache.hadoop.yarn.conf.YarnConfiguration;
+import org.apache.hadoop.yarn.api.records.NodeState;
+import scala.util.{Try, Success, Failure}
+
+val log = LoggerFactory.getLogger("wait-for-cluster")
+val N = args(0).toInt
+val delayMilliseconds = 2000
+
+def getDataNodes(): Int = {
+    log.info("Getting data node count")
+    val dfs = FileSystem.get(new Configuration()).asInstanceOf[DistributedFileSystem]
+    dfs.getDataNodeStats(DatanodeReportType.LIVE).length
+}
+
+def getYarnNodes(): Int = {
+    log.info("Getting yarn node count")
+    val conf = new YarnConfiguration()
+    //conf.setLong(YarnConfiguration.RESOURCEMANAGER_CONNECT_MAX_WAIT_MS, 0)  // disable automatic retry
+    conf.setInt(CommonConfigurationKeysPublic.IPC_CLIENT_CONNECT_MAX_RETRIES_KEY, 0)  // disable automatic retry
+    conf.setInt(CommonConfigurationKeysPublic.IPC_CLIENT_CONNECT_TIMEOUT_KEY, 1000)  // 1 second
+
+    val yarn = YarnClient.createYarnClient()
+    yarn.init(conf)
+    yarn.start()
+    yarn.getNodeReports(NodeState.RUNNING).size()
+}
+
+var dataNodes: Try[Int] = Failure(new Exception("Not attempted"))
+var yarnNodes: Try[Int] = Failure(new Exception("Not attempted"))
+
+val interruptHook = sys.addShutdownHook {
+    def reportIfFailure(header: String, tried: Try[_]): Unit = tried match {
+        case Success(_) => ()
+        case Failure(e) => println(header); println(e)
+    }
+
+    println("Interrupted")
+    reportIfFailure("\n==================== Data node check unsuccessful ====================", dataNodes)
+    reportIfFailure("\n==================== Yarn node check unsuccessful ====================", yarnNodes)
+}
+
+def show(nodes: Try[Int]) = nodes.map(_.toString).getOrElse("?")
+
+while((dataNodes, yarnNodes) != (Success(N), Success(N))) {
+    dataNodes = Try(getDataNodes())
+    yarnNodes = Try(getYarnNodes())
+    print(show(dataNodes) + ":" + show(yarnNodes) + " ... ")
+    Thread.sleep(delayMilliseconds)
+}
+
+interruptHook.remove()
+println("OK")
