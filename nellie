@@ -6,8 +6,8 @@ import argparse
 import subprocess
 
 script_dir = os.path.dirname(__file__)
-docker_compose_base = ['docker-compose', '-f', os.path.join(script_dir, 'cloudera.yml')]
-docker_compose = docker_compose_base + ['-f', os.path.join(script_dir, 'cloudera.auxiliary.yml')]
+docker_compose_base = ['docker-compose', '-f', os.path.join(script_dir, 'cloudera', 'docker-compose.yml')]
+docker_compose = docker_compose_base + ['-f', os.path.join(script_dir, 'cloudera', 'docker-compose.auxiliary.yml')]
 
 parser = argparse.ArgumentParser(description='Manage a virtual hadoop cluster.')
 parser.add_argument('-c', dest='passthru', nargs=argparse.REMAINDER, help='execute a docker-compose command')

@@ -1,0 +1,11 @@
+version: '2'
+
+services:
+  client:
+    build: worker
+    links:
+      - server
+    volumes:
+      - ${PWD}:/host
+    working_dir: /host
+    privileged: true
