@@ -10,8 +10,20 @@ docker_compose_base = ['docker-compose', '-f', os.path.join(script_dir, 'clouder
 docker_compose = docker_compose_base + ['-f', os.path.join(script_dir, 'cloudera.auxiliary.yml')]
 
 parser = argparse.ArgumentParser(description='Manage a virtual hadoop cluster.')
-subparsers = parser.add_subparsers(dest='subcommand', metavar='subcommand')
-subparsers.required = True  # see http://stackoverflow.com/a/18283730/154770
+parser.add_argument('-c', dest='passthru', nargs=argparse.REMAINDER, help='execute a docker-compose command')
+subparsers = parser.add_subparsers(metavar='COMMAND')
+
+def parse_args():
+    args = parser.parse_args()
+    if args.passthru is not None:
+        args.func = passthru
+    elif not hasattr(args, 'func'):
+        parser.print_help()
+        sys.exit(0)
+    return args
+
+def passthru(args):
+    return subprocess.call(docker_compose + args.passthru)
 
 def up(args):
     subprocess.check_call(docker_compose_base + ['up', '-d'])
@@ -43,6 +55,6 @@ ps_parser = subparsers.add_parser('ps', help='List containers')
 ps_parser.set_defaults(func=ps)
 
 if __name__ == '__main__':
-    args = parser.parse_args()
+    args = parse_args()
     exitcode = args.func(args)
     sys.exit(exitcode)
