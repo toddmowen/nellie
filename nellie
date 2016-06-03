@@ -54,6 +54,15 @@ def ps(args):
 ps_parser = subparsers.add_parser('ps', help='List containers')
 ps_parser.set_defaults(func=ps)
 
+def scale(args):
+    nodes = args.N
+    return subprocess.call(docker_compose + ['scale', 'worker=' + str(nodes - 1)]) \
+        or subprocess.call(docker_compose + ['run', '--rm', 'client', '/usr/bin/wait-for-cluster', str(nodes)])
+
+scale_parser = subparsers.add_parser('scale', help='Scale cluster to N nodes (WARNING: downscaling may corrupt HDFS)')
+scale_parser.add_argument('N', type=int, help='Desired number of nodes')
+scale_parser.set_defaults(func=scale)
+
 if __name__ == '__main__':
     args = parse_args()
     exitcode = args.func(args)
