@@ -9,6 +9,9 @@
 
 HADOOP_ROOT_LOGGER=${HADOOP_ROOT_LOGGER:-ERROR,console}
 
+# Some immediate feedback to user (before the slow JVM startup plus scala compilation).
+echo -n "Waiting ... "
+
 # The docker image does not include the 'scala' program, but it does include all
 # the necessary jars for us to invoke the scala interpretter via java:
 exec java \
@@ -53,8 +56,9 @@ def getYarnNodes(): Int = {
     yarn.getNodeReports(NodeState.RUNNING).size()
 }
 
-var dataNodes: Try[Int] = Failure(new Exception("Not attempted"))
-var yarnNodes: Try[Int] = Failure(new Exception("Not attempted"))
+val notAttempted = Failure(new Exception("Not yet attempted"))
+var dataNodes: Try[Int] = notAttempted
+var yarnNodes: Try[Int] = notAttempted
 
 val interruptHook = sys.addShutdownHook {
     def reportIfFailure(header: String, tried: Try[_]): Unit = tried match {
@@ -70,10 +74,11 @@ val interruptHook = sys.addShutdownHook {
 def show(nodes: Try[Int]) = nodes.map(_.toString).getOrElse("?")
 
 while((dataNodes, yarnNodes) != (Success(N), Success(N))) {
+    if(dataNodes != notAttempted)  // no delay on first iteration of loop
+        Thread.sleep(delayMilliseconds)
     dataNodes = Try(getDataNodes())
     yarnNodes = Try(getYarnNodes())
     print(show(dataNodes) + ":" + show(yarnNodes) + " ... ")
-    Thread.sleep(delayMilliseconds)
 }
 
 interruptHook.remove()
