@@ -7,5 +7,6 @@ services:
       - server
     volumes:
       - ${PWD}:/host
+      - /tmp  # workaround "File name too long" errors when extracting some jars
     working_dir: /host
     privileged: true
