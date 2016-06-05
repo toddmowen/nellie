@@ -7,6 +7,11 @@ services:
     hostname: quickstart.cloudera
     container_name: quickstart.cloudera
     privileged: true
+    ports:
+      - "50070:50070"  # hdfs status
+      - "8088:8088"    # jobtracker
+      - "19888:19888"  # jobhistory
+
     expose:
       - "8020"  # hdfs
       - "8032"  # yarn
