@@ -23,7 +23,7 @@ and uses hadoop streaming to grep for lines containing the word "nellie":
 
     nellie run hdfs dfs -mkdir grep.in
     nellie run hdfs dfs -put README.md grep.in
-    nellie run hadoop jar /usr/lib/hadoop-mapreduce/hadoop-streaming.jar -input grep.in -output grep.out -mapper 'grep nellie' -reducer 'cat'
+    nellie run hadoop jar /usr/lib/hadoop-mapreduce/hadoop-streaming.jar -input grep.in -output grep.out -mapper '/bin/grep nellie' -reducer '/bin/cat'
     nellie run hdfs dfs -cat 'grep.out/*'
 
 Notice that the reference above to README.md worked, even though the command is running under docker.

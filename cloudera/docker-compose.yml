@@ -7,17 +7,23 @@ services:
     hostname: quickstart.cloudera
     container_name: quickstart.cloudera
     privileged: true
-    ports:
-      - "50070:50070"  # hdfs status
-      - "8088:8088"    # jobtracker
-      - "19888:19888"  # jobhistory
-
     expose:
-      - "8020"  # hdfs
-      - "8032"  # yarn
+      - "80"     # tutorial
+      - "8020"   # hdfs
+      - "8032"   # yarn
+      - "8088"   # jobtracker
+      - "19888"  # jobhistory
+      - "50070"  # hdfs status
 
   worker:
     build: worker
     links:
       - server
     command: bash -c "/usr/bin/nellie-worker && sleep infinity"
+
+  webproxy:
+    #image: paintedfox/tinyproxy:1.8.3
+    build: worker
+    command: sleep infinity
+    ports:
+      - "127.0.0.1::8888"
