@@ -22,8 +22,6 @@ services:
     command: bash -c "/usr/bin/nellie-worker && sleep infinity"
 
   webproxy:
-    #image: paintedfox/tinyproxy:1.8.3
-    build: worker
-    command: sleep infinity
+    image: paintedfox/tinyproxy:1.8.3
     ports:
       - "127.0.0.1::8888"
