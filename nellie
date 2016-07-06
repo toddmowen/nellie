@@ -26,8 +26,8 @@ def passthru(args):
     return subprocess.call(docker_compose + args.passthru)
 
 def up(args):
-    return subprocess.call(docker_compose_base + ['up', '-d']) \
-        or subprocess.call(docker_compose + ['run', '--rm', 'client', '/usr/bin/wait-for-cluster', '2'])
+    return subprocess.call(docker_compose_base + ['up', '-d', 'server', 'webproxy']) \
+        or subprocess.call(docker_compose + ['run', '--rm', 'client', '/usr/bin/wait-for-cluster', '1'])
 
 up_parser = subparsers.add_parser('up', help='Bring up the cluster')
 up_parser.set_defaults(func=up)
