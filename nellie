@@ -4,6 +4,7 @@ import sys
 import os
 import argparse
 import subprocess
+from urlparse import urlparse
 
 script_dir = os.path.dirname(__file__)
 docker_compose_base = ['docker-compose', '-f', os.path.join(script_dir, 'cloudera', 'docker-compose.yml')]
@@ -62,6 +63,22 @@ def scale(args):
 scale_parser = subparsers.add_parser('scale', help='Scale cluster to N nodes (WARNING: downscaling may corrupt HDFS)')
 scale_parser.add_argument('N', type=int, help='Desired number of nodes')
 scale_parser.set_defaults(func=scale)
+
+def jobtracker(args):
+    chrome("http://quickstart.cloudera:8088/")
+
+jobtracker_parser = subparsers.add_parser('jobtracker', help='Open the jobtracker web interface in Chrome')
+jobtracker_parser.set_defaults(func=jobtracker)
+
+def chrome(url):
+    port = subprocess.check_output(docker_compose + ['port', 'webproxy', '8888']).decode().strip()
+    portnum = port.split(':')[1]
+    host = urlparse(os.environ['DOCKER_HOST']).netloc.split(':')[0]
+    proxy = host + ":" + portnum
+    # TODO (solution will probably involve passing --user-data-dir)
+    print "WARNING: Correct proxy settings will not be injected if Chrome is currently running."
+    subprocess.call(['open', '-a', 'Google Chrome', url,
+                     '--args', '--proxy-server=http={};https={}'.format(proxy, proxy)])
 
 if __name__ == '__main__':
     args = parse_args()
