@@ -15,6 +15,10 @@ Nellie 0.1.0 has been released, with the following known issues:
   where the original `nellie up` command was issued, and *not* the location
   where the `nellie exec` command is issued.
 
+- The `nellie jobtracker` command, which launches Chrome, will not correctly
+  set the proxy configuration unless it is opening a new instance of Chrome,
+  i.e. when Chrome is not already running.
+
 - Job logs cannot be viewed via the web interface (an error page is displayed:
   "Failed while trying to construct the redirect url to the log server").
   The workaround is to use the yarn CLI, e.g.:
