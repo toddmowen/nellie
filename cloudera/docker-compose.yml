@@ -29,3 +29,13 @@ services:
       - server
     ports:
       - "8888"  # ideally we should only bind to the host IP, but we can't inspect that
+
+  client:
+    build: worker
+    links:
+      - server
+    volumes:
+      - ${PWD}:/host
+      - /tmp  # workaround "File name too long" errors when extracting some jars
+    working_dir: /host
+    privileged: true

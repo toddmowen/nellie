@@ -7,8 +7,7 @@ import subprocess
 from urlparse import urlparse
 
 script_dir = os.path.dirname(__file__)
-docker_compose_base = ['docker-compose', '-f', os.path.join(script_dir, 'cloudera', 'docker-compose.yml')]
-docker_compose = docker_compose_base + ['-f', os.path.join(script_dir, 'cloudera', 'docker-compose.auxiliary.yml')]
+docker_compose = ['docker-compose', '-f', os.path.join(script_dir, 'cloudera', 'docker-compose.yml')]
 
 parser = argparse.ArgumentParser(description='Manage a virtual hadoop cluster.')
 parser.add_argument('-c', dest='passthru', nargs=argparse.REMAINDER, help='execute a docker-compose command')
@@ -27,7 +26,7 @@ def passthru(args):
     return subprocess.call(docker_compose + args.passthru)
 
 def up(args):
-    return subprocess.call(docker_compose_base + ['up', '-d', 'server', 'webproxy']) \
+    return subprocess.call(docker_compose + ['up', '-d', 'server', 'webproxy']) \
         or subprocess.call(docker_compose + ['run', '--rm', 'client', '/usr/bin/wait-for-cluster', '1'])
 
 up_parser = subparsers.add_parser('up', help='Bring up the cluster')
