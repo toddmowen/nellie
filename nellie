@@ -69,6 +69,14 @@ def jobtracker(args):
 jobtracker_parser = subparsers.add_parser('jobtracker', help='Open the jobtracker web interface in Chrome')
 jobtracker_parser.set_defaults(func=jobtracker)
 
+def exec_(args):
+    return subprocess.call(docker_compose + ['exec', 'server', args.program] + args.args)
+
+exec_parser = subparsers.add_parser('exec', help='Temporary alternative to "run" (which is currently broken)')
+exec_parser.add_argument('program')
+exec_parser.add_argument('args', nargs=argparse.REMAINDER)
+exec_parser.set_defaults(func=exec_)
+
 def chrome(url):
     port = subprocess.check_output(docker_compose + ['port', 'webproxy', '8888']).decode().strip()
     portnum = port.split(':')[1]

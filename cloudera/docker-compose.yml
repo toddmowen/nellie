@@ -17,6 +17,12 @@ services:
       - "19888"  # jobhistory
       - "50070"  # hdfs status
 
+    # The following settings are required to support 'exec', which is only a temporary workaround.
+    volumes:
+      - ${PWD}:/host
+      - /tmp  # workaround "File name too long" errors when extracting some jars
+    working_dir: /host
+
   worker:
     build: worker
     links:
