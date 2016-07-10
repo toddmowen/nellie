@@ -15,12 +15,12 @@ parser.add_argument('-c', dest='passthru', nargs=argparse.REMAINDER, help='execu
 subparsers = parser.add_subparsers(metavar='COMMAND')
 
 def parse_args():
-    args = parser.parse_args()
-    if args.passthru is not None:
-        args.func = passthru
-    elif not hasattr(args, 'func'):
-        parser.print_help()
-        sys.exit(0)
+    # When -c is passed, no other subcommand is expected. But prior to Python 3.3,
+    # the subparser cannot be optional. Instead, we handle the parsing of -c ourselves:
+    if sys.argv[1:2] == ['-c']:
+        args = argparse.Namespace(func=passthru, passthru=sys.argv[2:])
+    else:
+        args = parser.parse_args()
     return args
 
 def passthru(args):
