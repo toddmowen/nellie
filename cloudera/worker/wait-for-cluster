@@ -10,7 +10,7 @@
 HADOOP_ROOT_LOGGER=${HADOOP_ROOT_LOGGER:-ERROR,console}
 
 # Some immediate feedback to user (before the slow JVM startup plus scala compilation).
-echo -n "Waiting ... "
+echo -n "Waiting (datanodes:yarnnodes) ... "
 
 # The docker image does not include the 'scala' program, but it does include all
 # the necessary jars for us to invoke the scala interpretter via java:
