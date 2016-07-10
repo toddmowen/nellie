@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+VERSION = 'Nellie 0.1.0'
+
 import sys
 import os
 import argparse
@@ -10,6 +12,7 @@ script_dir = os.path.dirname(__file__)
 docker_compose = ['docker-compose', '-f', os.path.join(script_dir, 'cloudera', 'docker-compose.yml')]
 
 parser = argparse.ArgumentParser(description='Manage a virtual hadoop cluster.')
+parser.add_argument('--version', action='version', version=VERSION)
 parser.add_argument('-c', dest='passthru', nargs=argparse.REMAINDER, help='execute a docker-compose command')
 subparsers = parser.add_subparsers(metavar='COMMAND')
 

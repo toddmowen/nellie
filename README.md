@@ -4,10 +4,30 @@ Nellie: spin up a virtual hadoop cluster with docker
 *Up! Down! Run! That's a good hadoop...*
 
 
+KNOWN ISSUES: Nellie 0.1
+------------------------
+
+Nellie 0.1.0 has been released, with the following known issues:
+
+- MapReduce jobs launched with `nellie run` fail. A temporary alternative,
+  `nellie exec`, has been provided as a workaround. Usage is identical to
+  `nellie run`, except that the working directory will be set to the location
+  where the original `nellie up` command was issued, and *not* the location
+  where the `nellie exec` command is issued.
+
+- Job logs cannot be viewed via the web interface (an error page is displayed:
+  "Failed while trying to construct the redirect url to the log server").
+  The workaround is to use the yarn CLI, e.g.:
+
+```
+$ nellie exec yarn logs -applicationId application_1468148189971_0001
+```
+
+
 Getting Started
 ---------------
 
-If you have docker, docker-compose, and Python 3.x already installed on your system,
+If you have docker, docker-compose, and Python 2.x already installed on your system,
 then cloning this repo and running the following command should be all you need to bring up
 a basic Hadoop "cluster" containing a single node:
 
