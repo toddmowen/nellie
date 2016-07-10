@@ -8,7 +8,8 @@ Getting Started
 ---------------
 
 If you have docker, docker-compose, and Python 3.x already installed on your system,
-then cloning this repo and running the following command should be all you need to bring up a 2 node Hadoop cluster:
+then cloning this repo and running the following command should be all you need to bring up
+a basic Hadoop "cluster" containing a single node:
 
     ./nellie up
 
